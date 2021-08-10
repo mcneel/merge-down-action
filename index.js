@@ -78,11 +78,12 @@ async function run() {
 
     // clean up old merge-down branch
     if (branch.match(/-merge-[0-9]+\.([0-9]+|x)$/)) {
+      console.log(`Cleaning up old merge-down branch: ${branch}`);
       try {
         await octokit.rest.git.deleteRef({ owner, repo, ref: 'heads/' + branch });
       } catch (err) {
         core.error(err);
-        core.warning(`Failed to delete old merge-down branch: ${branch}`);
+        core.warning(`Failed to delete old merge-down branch`);
       }
     }
 
