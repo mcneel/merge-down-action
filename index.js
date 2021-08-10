@@ -76,6 +76,17 @@ async function run() {
     const branch = pull.head.ref;
     console.log(`${branch}: ${base_ref} -> ${target}`);
 
+    // clean up old merge-down branch
+    if (branch.match(/-merge-[0-9]+\.([0-9]+|x)$/)) {
+      console.log(`Cleaning up old merge-down branch: ${branch}`);
+      try {
+        await octokit.rest.git.deleteRef({ owner, repo, ref: 'heads/' + branch });
+      } catch (err) {
+        core.error(err);
+        core.warning(`Failed to delete old merge-down branch`);
+      }
+    }
+
     if (target === null) {
       core.warning(`Base branch is not a release or development branch: ${base_ref}`);
       return;
