@@ -12,7 +12,7 @@ The same thing will happen for changes merged into a development branch (e.g. `1
 
 **Required** A personal access token with write access to the repository.
 
-The action's `GITHUB_TOKEN` doesn't work, because the required checks won't be triggered for the new branch.
+The action's `GITHUB_TOKEN` doesn't work, because the required checks won't be triggered for the new branch. This is because [an action in a workflow run can't trigger a new workflow run](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).
 
 <!-- ## Outputs
 
