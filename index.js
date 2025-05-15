@@ -10,20 +10,24 @@ const owner = pull.base.repo.owner.login;
 const repo = pull.base.repo.name;
 // TODO: use github.context.repo?
 
-const develop_branch_pattern = /^(\d+)\.x$/; // e.g. 1.0
-const release_branch_pattern = /^(\d+)\.\d+$/; // e.g. 1.x
+const branch_prefix = core.getInput('branch-prefix'); // e.g. 'rhino-' (default: '')
+
+const develop_branch_pattern = new RegExp(`^${branch_prefix}(\\d+)\\.x$`); // e.g. 1.0
+const release_branch_pattern = new RegExp(`^${branch_prefix}(\\d+)\\.\\d+$`); // e.g. 1.x
+
+core.debug(`develop_branch_pattern: ${develop_branch_pattern}, release_branch_pattern: ${release_branch_pattern}`);
 
 function flow(branch) {
   // develop branch
   let m = branch.match(develop_branch_pattern)
   if (m !== null) {
-    return `${parseInt(m[1]) + 1}.x`;
+    return `${branch_prefix}${parseInt(m[1]) + 1}.x`;
   }
 
   // release branch
   m = branch.match(release_branch_pattern);
   if (m !== null) {
-    return `${m[1]}.x`
+    return `${branch_prefix}${m[1]}.x`
   }
 
   return null;
@@ -76,6 +80,11 @@ async function run() {
     const branch = pull.head.ref;
     console.log(`${branch}: ${base_ref} -> ${target}`);
 
+    if (target === null) {
+      core.warning(`Base branch is not a release or development branch: ${base_ref} (branch-prefix: ${branch_prefix})`);
+      return;
+    }
+
     // clean up old merge-down branch
     if (branch.match(/-merge-[0-9]+\.([0-9]+|x)$/)) {
       console.log(`Cleaning up old merge-down branch: ${branch}`);
@@ -85,11 +94,6 @@ async function run() {
         core.error(err);
         core.warning(`Failed to delete old merge-down branch`);
       }
-    }
-
-    if (target === null) {
-      core.warning(`Base branch is not a release or development branch: ${base_ref}`);
-      return;
     }
 
     // check if target branch exists

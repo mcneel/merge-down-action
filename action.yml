@@ -1,16 +1,12 @@
 name: 'Hello World'
 description: 'Greet someone and record the time'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
-    required: true
-    default: 'World'
   token:
     description: 'The GITHUB_TOKEN secret'
     required: true
-outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  branch-prefix:
+    description: 'Branch prefix e.g. "rhino-" if your branches look like "rhino-1.x"'
+    default: ''
 runs:
-  using: 'node12'
+  using: 'node20'
   main: 'index.js'
